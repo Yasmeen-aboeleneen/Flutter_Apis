@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_api/Cubit/user_state.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -25,4 +26,18 @@ class UserCubit extends Cubit<UserState> {
   TextEditingController signUpPassword = TextEditingController();
   //Sign up confirm password
   TextEditingController confirmPassword = TextEditingController();
+
+  signIn() async {
+    try {
+      emit(SignInLoading());
+      final response = await Dio().post(
+          'https://food-api-omega.vercel.app/api/v1/user/signin',
+          data: {"email": signInEmail.text, "password": signInPassword.text});
+      emit(SignInSuccess());
+      print(response);
+    } catch (e) {
+      emit(SignInFailure(errorMessage: e.toString()));
+      print(e.toString());
+    }
+  }
 }
