@@ -1,11 +1,21 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_api/Core/Api/api_consumer.dart';
+import 'package:flutter_api/Core/Api/api_interceptors.dart';
 import 'package:flutter_api/Core/Errors/exceptions.dart';
 
 class DioConsumer extends ApiConsumer {
   final Dio dio;
 
-  DioConsumer({required this.dio});
+  DioConsumer({required this.dio}) {
+    dio.options.baseUrl = 'https://food-api-omega.vercel.app/api/v1/';
+    dio.interceptors.add(ApiInterceptors());
+    dio.interceptors.add(LogInterceptor(
+        request: true,
+        requestHeader: true,
+        requestBody: true,
+        responseBody: true,
+        responseHeader: true));
+  }
   @override
   Future delete(String? path,
       {Object? data, Map<String, dynamic>? queryParameters}) async {
