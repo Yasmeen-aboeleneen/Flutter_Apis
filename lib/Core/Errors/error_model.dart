@@ -1,3 +1,5 @@
+import 'package:flutter_api/Core/Api/end_points.dart';
+
 class ErrorModel {
   final int status;
   final String errorMessage;
@@ -6,6 +8,7 @@ class ErrorModel {
 
   factory ErrorModel.fromJson(Map<String, dynamic> jsonData) {
     return ErrorModel(
-        status: jsonData['status'], errorMessage: jsonData['ErrorMessage']);
+        status: jsonData[ApiKeys.status],
+        errorMessage: jsonData[ApiKeys.errorMessage]);
   }
 }

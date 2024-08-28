@@ -1,13 +1,14 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_api/Core/Api/api_consumer.dart';
 import 'package:flutter_api/Core/Api/api_interceptors.dart';
+import 'package:flutter_api/Core/Api/end_points.dart';
 import 'package:flutter_api/Core/Errors/exceptions.dart';
 
 class DioConsumer extends ApiConsumer {
   final Dio dio;
 
   DioConsumer({required this.dio}) {
-    dio.options.baseUrl = 'https://food-api-omega.vercel.app/api/v1/';
+    dio.options.baseUrl = EndPoints.baseUrl;
     dio.interceptors.add(ApiInterceptors());
     dio.interceptors.add(LogInterceptor(
         request: true,
@@ -18,10 +19,13 @@ class DioConsumer extends ApiConsumer {
   }
   @override
   Future delete(String? path,
-      {Object? data, Map<String, dynamic>? queryParameters}) async {
+      {dynamic data,
+      Map<String, dynamic>? queryParameters,
+      bool isFormData = false}) async {
     try {
-      final response =
-          await dio.delete(path!, data: data, queryParameters: queryParameters);
+      final response = await dio.delete(path!,
+          data: isFormData ? FormData.fromMap(data) : data,
+          queryParameters: queryParameters);
       return response.data;
     } on DioException catch (e) {
       handleDioExceptions(e);
@@ -42,10 +46,13 @@ class DioConsumer extends ApiConsumer {
 
   @override
   Future patch(String? path,
-      {Object? data, Map<String, dynamic>? queryParameters}) async {
+      {dynamic data,
+      Map<String, dynamic>? queryParameters,
+      bool isFormData = false}) async {
     try {
-      final response =
-          await dio.patch(path!, data: data, queryParameters: queryParameters);
+      final response = await dio.patch(path!,
+          data: isFormData ? FormData.fromMap(data) : data,
+          queryParameters: queryParameters);
       return response.data;
     } on DioException catch (e) {
       handleDioExceptions(e);
@@ -54,10 +61,13 @@ class DioConsumer extends ApiConsumer {
 
   @override
   Future post(String? path,
-      {Object? data, Map<String, dynamic>? queryParameters}) async {
+      {dynamic data,
+      Map<String, dynamic>? queryParameters,
+      bool isFormData = false}) async {
     try {
-      final response =
-          await dio.post(path!, data: data, queryParameters: queryParameters);
+      final response = await dio.post(path!,
+          data: isFormData ? FormData.fromMap(data) : data,
+          queryParameters: queryParameters);
       return response.data;
     } on DioException catch (e) {
       handleDioExceptions(e);
