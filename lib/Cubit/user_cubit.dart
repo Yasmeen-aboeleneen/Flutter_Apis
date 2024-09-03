@@ -1,9 +1,14 @@
- import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_api/Core/Api/end_points.dart';
+import 'package:flutter_api/Core/Cache/cache_helper.dart';
+import 'package:flutter_api/Core/Errors/exceptions.dart';
+import 'package:flutter_api/Core/Models/sign_in_model.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
 
 import 'package:flutter_api/Core/Api/api_consumer.dart';
 import 'package:flutter_api/Cubit/user_state.dart';
+import 'package:jwt_decoder/jwt_decoder.dart';
 
 class UserCubit extends Cubit<UserState> {
   UserCubit(
@@ -30,20 +35,21 @@ class UserCubit extends Cubit<UserState> {
   TextEditingController signUpPassword = TextEditingController();
   //Sign up confirm password
   TextEditingController confirmPassword = TextEditingController();
-
+  SignInModel? user;
   signIn() async {
     try {
       emit(SignInLoading());
-      final response = await api.post(
-          // 'https://food-api-omega.vercel.app/api/v1/user/signin',
-          // data: {"email": signInEmail.text, "password": signInPassword.text}
-          
-          );
+      final response = await api.post(EndPoints.signIn, data: {
+        ApiKeys.email: signInEmail.text,
+        ApiKeys.password: signInPassword.text
+      });
+      user = SignInModel.fromJson(response);
+      final decodedToken = JwtDecoder.decode(user!.token);
+      CacheHelper().saveData(key: ApiKeys.token, value: user!.token);
+      CacheHelper().saveData(key: ApiKeys.id, value: decodedToken[ApiKeys.id]);
       emit(SignInSuccess());
-      print(response);
-    } catch (e) {
-      emit(SignInFailure(errorMessage: e.toString()));
-      print(e.toString());
+    } on ServerException catch (e) {
+      emit(SignInFailure(errorMessage: e.errorModel.errorMessage));
     }
   }
 }
